@@ -308,7 +308,7 @@ evalTypeM a = do    {
                     }
 
 evalTypeOptM :: ABE -> Maybe ABE
-evalTypeOptM a = do    {
+evalTypeOptM a = do {
                     typeofM a;
                     evalM $ optimize a;
                     }
@@ -321,23 +321,34 @@ testCases = [    "(if true && isZero 1 then 5 else 6)+0+0+0+0"
                 , "true && 7 <= 6 && true"
                 , "5+5"
                 , "5-4"
+                , "4-5"
+                , "4/0"
                 , "15/3"
                 , "3*5"
                 , "if true then 1 else 0"
                 , "0 <= 1"
                 , "true && false" ]
 
+testCasesTypecheck = [ "(if 0 then 5 else 6)"
+                      ,"if true then 5 else true"
+                      ,"5+true"
+                      ,"5&&true"
+                      ,"true <= 7"
+                      ,"true - false"
+                    ]
+runTests :: IO()
 runTests = do
     putStrLn $ "Pre optimize"
     putStrLn $ unlines $ map pprint parsed
     putStrLn $ "Post optimize"   
     putStrLn $ unlines $ map pprint (map optimize parsed )
-    putStrLn $ "\nEvals"
+    putStrLn $ "\nEvals that should fail typecheck:"
+    putStrLn $ show $ map evalTypeM parsedTypecheck
+    putStrLn $ "\nEvals that should all match:"
     putStrLn $ show $ map evalM parsed
     putStrLn $ show $ map evalErr parsed
     putStrLn $ show $ map evalTypeM parsed
     putStrLn $ show $ map interpOptM parsed
     putStrLn $ show $ map evalTypeOptM parsed
         where parsed = (map parseABE  testCases) 
-
-main = runTests
+              parsedTypecheck = map parseABE testCasesTypecheck
