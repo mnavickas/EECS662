@@ -174,30 +174,34 @@ evalErr (Plus l r) =
   do r1 <- (evalErr l)
      r2 <- (evalErr r)
      case r1 of
-       (Num v1) -> case r2 of
+        (Num v1) -> case r2 of
                      (Num v2) -> (return (Num (v1+v2)))
                      _ -> Nothing
+        _ -> Nothing
 evalErr (Minus l r) =
   do r1 <- (evalErr l)
      r2 <- (evalErr r)
      case r1 of
-       (Num v1) -> case r2 of
+        (Num v1) -> case r2 of
                      (Num v2) -> if v1-v2 >= 0 then (return (Num (v1-v2))) else Nothing
                      _ -> Nothing
+        _ -> Nothing
 evalErr (Mult l r) =
   do r1 <- (evalErr l)
      r2 <- (evalErr r)
      case r1 of
-       (Num v1) -> case r2 of
+          (Num v1) -> case r2 of
                      (Num v2) -> (return (Num (v1*v2)))
                      _ -> Nothing
+          _ -> Nothing
 evalErr (Div l r) =
   do r1 <- (evalErr l)
      r2 <- (evalErr r)
      case r1 of
-       (Num v1) -> case r2 of
+        (Num v1) -> case r2 of
                      (Num v2) -> if v2 == 0 then Nothing else (return (Num (div v1 v2)))
                      _ -> Nothing
+        _ -> Nothing
 evalErr (And l r) =
   do r1 <- (evalErr l)
      r2 <- (evalErr r)
