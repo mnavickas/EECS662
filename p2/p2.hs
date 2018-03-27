@@ -273,7 +273,61 @@ testMS = testBBAE . parseBBAE
 
 solveTypeofM = typeofM [] . parseBBAE
 
-solveEvalT = evalT . parseBBAE
 
-main = do
-  putStrLn $ show $ solveEvalT "bind x = 0 in true && isZero x"
+testCases = [
+           "(if true && isZero 1 then 5 else 6)+0+0+0+0"
+          ,"(5+5-3) + if (isZero 5+5) then (5-4) else (5+8)"
+          , "if 1 <= (6+4) then true && true else false && true"
+          , "true && 5 <= 6 && true"
+          , "true && 7 <= 6 && true"
+          , "5+5"
+          , "5-4"
+          , "4+0"
+          , "if true then 1 else 0"
+          , "0 <= 1"
+          , "true && false"
+          , "bind x = 0 in true && isZero x"
+          , "bind x = false in true && x"
+          , "bind x = (if isZero 4 then 5+5 else 5) in x<=7"
+          , "bind x = 0 in bind x = isZero x in true && x"
+          , "bind x = 0 in bind y = isZero x in true && y"
+          , "bind x = 1 in bind y = 2 in bind z = 3 in x+y+z"
+          , "bind x = 1 in bind x = 2 in bind x = 3 in x"
+          , "bind x = 1 in bind x = 2 in bind x = 3 in x+x+x"
+          , "(bind x = 1 in (bind x = 2 in (bind x = 3 in x)+x)+x)"
+          ]
+
+expected =[
+           Just (Num 6)
+          ,Just (Num 20)
+          ,Just (Boolean True)
+          ,Just (Boolean True)
+          ,Just (Boolean False)
+          ,Just (Num 10)
+          ,Just (Num 1)
+          ,Just (Num 4)
+          ,Just (Num 1)
+          ,Just (Boolean True)
+          ,Just (Boolean False)
+          ,Just (Boolean True)
+          ,Just (Boolean False)
+          ,Just (Boolean True)
+          ,Just (Boolean True)
+          ,Just (Boolean True)
+          ,Just (Num 6)
+          ,Just (Num 3)
+          ,Just (Num 9)
+          ,Just (Num 6)
+          ]
+
+runTests = do
+    putStrLn $ "EvalS: " ++ if all (==True) evalSResult then success else show evalSResult
+    putStrLn $ "EvalM: " ++ if all (==True) evalMResult then success else show evalMResult
+    putStrLn $ "Comparing EvalM and EvalS in testBBAE: "++ (if all (==True) (map testBBAE parsed) then "All match" else "Not all Match") ++ "\n"
+    putStrLn $ show (map (typeofM []) parsed) ++ "\n"
+    putStrLn $ "EvalT: " ++ if all (==True) evalTResult then success else show evalTResult
+    where parsed = map parseBBAE testCases
+          evalSResult = (zipWith (==) expected (map evalS parsed))
+          evalMResult = (zipWith (==) expected (map (evalM []) parsed))
+          evalTResult = (zipWith (==) expected (map evalT parsed))
+          success = "All Match Expected"
