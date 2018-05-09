@@ -153,9 +153,11 @@ expressions =   [
     -- app fact 5
 
                 ]
-main = 
+runTests = 
     do  putStrLn $ show $ map (evalCFBAE []) expressions
         putStrLn $ show $ map (evalDynCFBAE []) expressions
+
+main = runTests
                                                     
                                                     
 
